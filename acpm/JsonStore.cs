@@ -17,6 +17,17 @@ namespace acpm
             this.saveJson(values);
         }
 
+        public int getVersionInstalled(string packageName)
+        {
+            Dictionary<string, int> values = JsonConvert.DeserializeObject<Dictionary<string, int>>(this.getJson());
+            if(values.ContainsKey(packageName))
+            {
+                return values[packageName];
+            }
+
+            return 0;
+        }
+
         private void saveJson(Dictionary<string, int> dictJason)
         {
             string json = JsonConvert.SerializeObject(dictJason);

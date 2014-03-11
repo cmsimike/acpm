@@ -18,7 +18,21 @@ namespace acpm
 
         public string status {
             get {
-                return "Not installed";
+                JsonStore store = new JsonStore();
+                int installedVersion = store.getVersionInstalled(this.packageName);
+                if(installedVersion == 0)
+                {
+                    return "Not installed";
+                }
+                else if(installedVersion == this.version)
+                {
+                    return "Up to date";
+                }
+                else if(installedVersion < this.version)
+                {
+                    return "Needs update";
+                }
+                return "Something bad";
             }
         }
     }
