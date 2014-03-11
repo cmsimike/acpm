@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace acpm
 {
@@ -26,9 +27,12 @@ namespace acpm
 
         public void pullLatestPackages()
         {
-            List<Package> packages = this.getPackagesLocal();
-
-            if(packages.Count > 0)
+            List<Package> packages = this.getPackagesGithub();
+            if(packages == null)
+            {
+                this.setText(this.label2, "There was a problem loading the repository.\nPlease restart the app to try again.");
+            }
+            else if(packages.Count > 0)
             {
                 this.dataGridView1.DataSource = packages;
                 // Let's figure out which columns we should hide!
@@ -119,6 +123,22 @@ namespace acpm
             string json = myFile.ReadToEnd();
             myFile.Close();
             return this.jsonToPackages(json);
+        }
+
+        private List<Package> getPackagesGithub()
+        {
+            using (WebClient client = new WebClient())
+            {
+                try
+                {
+                    string s = client.DownloadString(@"https://raw.github.com/cmsimike/acpmr/master/repository.json");
+                    return this.jsonToPackages(s);
+                }
+                catch(WebException e)
+                {
+                    return null;
+                }
+            }
         }
     }
 }
