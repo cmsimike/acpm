@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
 using Newtonsoft.Json;
+
 namespace acpm
 {
     public partial class Form1 : Form
@@ -26,7 +27,6 @@ namespace acpm
         public void pullLatestPackages()
         {
             List<Package> packages = this.getPackagesLocal();
-           
             /*for (var i = 0; i < 40; i++ )
             {
                 Package p = new Package();
@@ -98,7 +98,8 @@ namespace acpm
             if (this.dataGridView1.SelectedRows.Count > 0)
             {
                 Package selectedPackage = this.dataGridView1.SelectedRows[0].DataBoundItem as Package;
-                MessageBox.Show("selected " + selectedPackage);
+                JsonStore store = new JsonStore();
+                store.packageInstalled(selectedPackage.packageName, selectedPackage.version);
             }
             else
             {
@@ -110,7 +111,6 @@ namespace acpm
         {
             List<Package> packages = JsonConvert.DeserializeObject<List<Package>>(json);
 
-            Console.WriteLine(packages.Count);
             return packages;
         }
 
@@ -118,9 +118,10 @@ namespace acpm
         {
             System.IO.StreamReader myFile = new System.IO.StreamReader(@"packages.json");
             string json = myFile.ReadToEnd();
-            Console.WriteLine(json);
             myFile.Close();
             return this.jsonToPackages(json);
         }
+
+
     }
 }
