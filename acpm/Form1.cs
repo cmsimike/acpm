@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
+using Newtonsoft.Json;
 namespace acpm
 {
     public partial class Form1 : Form
@@ -24,17 +25,17 @@ namespace acpm
 
         public void pullLatestPackages()
         {
-            List<Package> packages = new List<Package>();
-
-            for (var i = 0; i < 40; i++ )
+            List<Package> packages = this.getPackagesLocal();
+           
+            /*for (var i = 0; i < 40; i++ )
             {
                 Package p = new Package();
-                p.Name = "Display name " + i;
-                p.DownloadUrl = "http://www.example.com/whatever" + i + ".zip";
-                p.PackageName = "displayname" + i;
-                p.Version = 1;
+                p.name = "Display name " + i;
+                p.downloadUrl = "http://www.example.com/whatever" + i + ".zip";
+                p.packageName = "displayname" + i;
+                p.version = 1;
                 packages.Add(p);
-            }
+            }*/
 
             if(packages.Count > 0)
             {
@@ -46,9 +47,11 @@ namespace acpm
 
                 this.dataGridView1.Columns[3].ReadOnly = true;
                 this.dataGridView1.Columns[3].FillWeight = 200;
+                this.dataGridView1.Columns[3].HeaderText = "Package Name";
 
                 this.dataGridView1.Columns[4].ReadOnly = true;
                 this.dataGridView1.Columns[4].FillWeight = 50;
+                this.dataGridView1.Columns[4].HeaderText = "Status";
 
                 this.setVisible(this.label2, false);
                 this.setVisible(this.panel1, true);
@@ -94,12 +97,30 @@ namespace acpm
         {
             if (this.dataGridView1.SelectedRows.Count > 0)
             {
-                MessageBox.Show("selected " + this.dataGridView1.SelectedRows[0].Index + " index");
+                Package selectedPackage = this.dataGridView1.SelectedRows[0].DataBoundItem as Package;
+                MessageBox.Show("selected " + selectedPackage);
             }
             else
             {
-                MessageBox.Show("Please make sure you've selected a package to install!");
+                MessageBox.Show(@"Please select a package to install!");
             }
+        }
+
+        private List<Package> jsonToPackages(string json)
+        {
+            List<Package> packages = JsonConvert.DeserializeObject<List<Package>>(json);
+
+            Console.WriteLine(packages.Count);
+            return packages;
+        }
+
+        private List<Package> getPackagesLocal()
+        {
+            System.IO.StreamReader myFile = new System.IO.StreamReader(@"packages.json");
+            string json = myFile.ReadToEnd();
+            Console.WriteLine(json);
+            myFile.Close();
+            return this.jsonToPackages(json);
         }
     }
 }

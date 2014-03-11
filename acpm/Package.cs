@@ -11,14 +11,14 @@ namespace acpm
         /** Important to note that ordering here is important because I am hiding columns based on position.
          * packageName is 0, version is 1 etc. Add new properties at the end
          */
-        public string PackageName {get; set;}
-        public int Version {get; set;}
-        public string DownloadUrl {get; set;}
-        public string Name { get; set; }
+        public string packageName {get; set;}
+        public int version {get; set;}
+        public string downloadUrl {get; set;}
+        public string name { get; set; }
 
-        public string Status {
+        public string status {
             get {
-                return "NEW!";
+                return "Not installed";
             }
         }
     }
