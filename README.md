@@ -1,4 +1,4 @@
-### acpm - Assetto Corsa Package Manager (Protype)
+### acpm - Assetto Corsa Package Manager (0.0.1)
 
 A (hopefully) simple way to help you manage your Assetto Corsa mods.
 
@@ -15,6 +15,11 @@ Since this is a prototype, it doesn't do a lot of things it probably should. Kno
 - This application will only assume the game is installed in the default c:\program files(blah blah bla)\assettocoresa. 
 - No uninstall
 - Updating packages overwrites any file on your hard drive that is in the zip. Not sure how that will play out.
+- If you click on "install" for any packages that may show up, it won't install anything but will create a package.json in the same directory as the executable. Final location will change.
 
 ### Issue Tracker
 Please submit any and all bugs and questions about acpm and any requests for additional data for [acpmr](https://github.com/cmsimike/acpmr/).
+
+
+## To Download
+Click into the releases tab and download the one that most closely matches your config.
