@@ -27,15 +27,6 @@ namespace acpm
         public void pullLatestPackages()
         {
             List<Package> packages = this.getPackagesLocal();
-            /*for (var i = 0; i < 40; i++ )
-            {
-                Package p = new Package();
-                p.name = "Display name " + i;
-                p.downloadUrl = "http://www.example.com/whatever" + i + ".zip";
-                p.packageName = "displayname" + i;
-                p.version = 1;
-                packages.Add(p);
-            }*/
 
             if(packages.Count > 0)
             {
@@ -98,8 +89,16 @@ namespace acpm
             if (this.dataGridView1.SelectedRows.Count > 0)
             {
                 Package selectedPackage = this.dataGridView1.SelectedRows[0].DataBoundItem as Package;
+                if(!selectedPackage.canInstall())
+                {
+                    MessageBox.Show("Sorry, you can't install this package right now.");
+                    return;
+                }
                 JsonStore store = new JsonStore();
                 store.packageInstalled(selectedPackage.packageName, selectedPackage.version);
+                MessageBox.Show(selectedPackage.name + " has been installed.");
+
+                this.dataGridView1.Refresh();
             }
             else
             {
@@ -121,7 +120,5 @@ namespace acpm
             myFile.Close();
             return this.jsonToPackages(json);
         }
-
-
     }
 }

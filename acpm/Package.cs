@@ -16,10 +16,10 @@ namespace acpm
         public string downloadUrl {get; set;}
         public string name { get; set; }
 
+        private JsonStore store = new JsonStore();
         public string status {
             get {
-                JsonStore store = new JsonStore();
-                int installedVersion = store.getVersionInstalled(this.packageName);
+                int installedVersion = this.store.getVersionInstalled(this.packageName);
                 if(installedVersion == 0)
                 {
                     return "Not installed";
@@ -34,6 +34,12 @@ namespace acpm
                 }
                 return "Something bad";
             }
+        }
+
+        public bool canInstall()
+        {
+            int installedVersion = this.store.getVersionInstalled(this.packageName);
+            return installedVersion == 0 || installedVersion < this.version; 
         }
     }
 }
