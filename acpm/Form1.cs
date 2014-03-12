@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.IO;
+using System.IO.Compression;
 
 namespace acpm
 {
@@ -114,10 +115,8 @@ namespace acpm
                     MessageBox.Show("Sorry, you can't install this package right now.");
                     return;
                 }
-                System.Console.WriteLine("before thread");
                 Thread thread = new Thread(() => this.downloadPackage(selectedPackage));
                 thread.Start();
-                System.Console.WriteLine("after thread");
             }
             else
             {
@@ -171,20 +170,91 @@ namespace acpm
             catch(Exception)
             {
                 thePackage.setErrored();
-                this.refreshDataGrid();
             }
+            this.refreshDataGrid();
         }
 
         // I am going to believe this works like Java's method syncronization.
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void installPackage(Package thePackage, string fileToUnzip)
         {
-            //TODO unzip right here
-            JsonStore store = new JsonStore();
+            try
+            {
+                string tmpDir = this.GetTemporaryDirectory();
+                System.Console.WriteLine(tmpDir);
+                ZipFile.ExtractToDirectory(fileToUnzip, tmpDir);
+                this.DirectoryCopy(tmpDir, this.getACPath(), true);
 
-            store.packageInstalled(thePackage);
-            thePackage.setComplete();
-            this.refreshDataGrid();
+                JsonStore store = new JsonStore();
+
+                store.packageInstalled(thePackage);
+                thePackage.setComplete();
+                 
+            }
+            catch(Exception)
+            {
+                thePackage.setErrored();
+            }
+        }
+
+        private string GetTemporaryDirectory()
+        {
+            string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDirectory);
+            return tempDirectory;
+        }
+
+        private string getACPath()
+        {
+            if(Directory.Exists(@"C:\Program Files (x86)\Steam\SteamApps\common\assettocorsa"))
+            {
+                return @"C:\Program Files (x86)\Steam\SteamApps\common\assettocorsa";
+            }
+            else if(Directory.Exists(@"C:\Program Files\Steam\SteamApps\common\assettocorsa"))
+            {
+                return @"C:\Program Files\Steam\SteamApps\common\assettocorsa";
+            }
+
+            return null;
+        }
+
+        // from http://msdn.microsoft.com/en-us/library/bb762914.aspx
+        private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            // If the destination directory doesn't exist, create it. 
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, true);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location. 
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
         }
     }
 }
