@@ -31,22 +31,14 @@ namespace acpm
         private void saveJson(Dictionary<string, int> dictJason)
         {
             string json = JsonConvert.SerializeObject(dictJason);
-            System.IO.File.WriteAllText(jsonStoraName, json);
+            Properties.Settings.Default.InstalledPackages = json;
+            Properties.Settings.Default.Save();
         }
 
         private string getJson()
         {
-            try
-            {
-                System.IO.StreamReader myFile = new System.IO.StreamReader(jsonStoraName);
-                string json = myFile.ReadToEnd();
-                myFile.Close();
-                return json;
-            }   
-            catch(Exception e)
-            {
-                return "{}";
-            }
+            string json = Properties.Settings.Default.InstalledPackages;
+            return json;
         }
     }
 }
