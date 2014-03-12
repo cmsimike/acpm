@@ -1,19 +1,19 @@
 [
    {
       "packageName":"test",
-      "downloadUrl":"http:\/\/www.example.com\/version.zip",
+      "downloadUrl":"http:\/\/rivalitempo-softgrip.rhcloud.com\/download\/rivali-ov1info-v2.0.zip",
       "version":1,
       "name": "Some Awesome Package"
    },
    {
       "packageName":"test1",
-      "downloadUrl":"http:\/\/www.example.com\/version1.zip",
+      "downloadUrl":"http:\/\/rivalitempo-softgrip.rhcloud.com\/download\/rivali-ov1info-v2.0.zip",
       "version":1,
       "name": "Some Awesome Package1"
    },
    {
       "packageName":"test2",
-      "downloadUrl":"http:\/\/www.example.com\/version2.zip",
+      "downloadUrl":"http:\/\/rivalitempo-softgrip.rhcloud.com\/download\/rivali-ov1info-v2.0.zip",
       "version":2,
       "name": "Some Awesome Package2"
    }

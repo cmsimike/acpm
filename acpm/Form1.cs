@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using System.Collections;
 using Newtonsoft.Json;
 using System.Net;
+using System.Runtime.CompilerServices;
+using System.IO;
 
 namespace acpm
 {
@@ -18,6 +20,8 @@ namespace acpm
     {
         delegate void SetVisibleCallback(Control control, bool visible);
         delegate void SetTextCallback(Control control, string text);
+        delegate void RefreshDataGridCallback();
+
         public Form1()
         {
             InitializeComponent();
@@ -27,7 +31,7 @@ namespace acpm
 
         public void pullLatestPackages()
         {
-            List<Package> packages = this.getPackagesGithub();
+            List<Package> packages = this.getPackagesLocal();
             if(packages == null)
             {
                 this.setText(this.label2, "There was a problem loading the repository.\nPlease restart the app to try again.");
@@ -74,7 +78,7 @@ namespace acpm
         {
             if(control.InvokeRequired)
             {
-                SetTextCallback d = new SetTextCallback(setText);
+                SetTextCallback d = new SetTextCallback(this.setText);
                 control.Invoke(d, new object[] { control, text });
             }
             else
@@ -82,8 +86,20 @@ namespace acpm
                 control.Text = text;
             }
         }
-
-        private void dgv_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        
+        private void refreshDataGrid()
+        {
+            if(this.dataGridView1.InvokeRequired)
+            {
+                RefreshDataGridCallback d = new RefreshDataGridCallback(this.refreshDataGrid);
+                this.dataGridView1.Invoke(d);
+            }
+            else
+            {
+                this.dataGridView1.Refresh();
+            }
+        }
+        private void dataGridView_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
         {
             e.PaintParts &= ~DataGridViewPaintParts.Focus;
         }
@@ -98,11 +114,10 @@ namespace acpm
                     MessageBox.Show("Sorry, you can't install this package right now.");
                     return;
                 }
-                JsonStore store = new JsonStore();
-                store.packageInstalled(selectedPackage.packageName, selectedPackage.version);
-                MessageBox.Show(selectedPackage.name + " has been installed.");
-
-                this.dataGridView1.Refresh();
+                System.Console.WriteLine("before thread");
+                Thread thread = new Thread(() => this.downloadPackage(selectedPackage));
+                thread.Start();
+                System.Console.WriteLine("after thread");
             }
             else
             {
@@ -134,11 +149,42 @@ namespace acpm
                     string s = client.DownloadString(@"https://raw.github.com/cmsimike/acpmr/master/repository.json");
                     return this.jsonToPackages(s);
                 }
-                catch(WebException e)
+                catch(WebException)
                 {
                     return null;
                 }
             }
+        }
+
+        private void downloadPackage(Package thePackage)
+        {
+            thePackage.setDownloading();
+            this.refreshDataGrid();
+            try
+            {
+                string tmpFile = Path.GetTempFileName();
+                WebClient Client = new WebClient();
+
+                Client.DownloadFile(thePackage.downloadUrl, tmpFile);
+                this.installPackage(thePackage, tmpFile);
+            }
+            catch(Exception)
+            {
+                thePackage.setErrored();
+                this.refreshDataGrid();
+            }
+        }
+
+        // I am going to believe this works like Java's method syncronization.
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private void installPackage(Package thePackage, string fileToUnzip)
+        {
+            //TODO unzip right here
+            JsonStore store = new JsonStore();
+
+            store.packageInstalled(thePackage);
+            thePackage.setComplete();
+            this.refreshDataGrid();
         }
     }
 }
