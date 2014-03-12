@@ -24,4 +24,4 @@ Please submit any and all bugs and questions about acpm and any requests for add
 
 
 ## To Download
-Click into the releases tab and download the one that most closely matches your config.
+Click into the releases tab and download the one that most closely matches your config. Download and unzip the file and run Assetto Corsa Package Manager.lnk. You can put that directory anywhere for now. An installer and auto updater are long term goals.
