@@ -32,7 +32,7 @@ namespace acpm
 
         public void pullLatestPackages()
         {
-            List<Package> packages = this.getPackagesLocal();
+            List<Package> packages = this.getPackagesGithub();
             if(packages == null)
             {
                 this.setText(this.label2, "There was a problem loading the repository.\nPlease restart the app to try again.");
