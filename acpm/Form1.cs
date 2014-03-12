@@ -14,6 +14,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.IO;
 using System.IO.Compression;
+using Microsoft.Win32;
 
 namespace acpm
 {
@@ -206,16 +207,25 @@ namespace acpm
 
         private string getACPath()
         {
-            if(Directory.Exists(@"C:\Program Files (x86)\Steam\SteamApps\common\assettocorsa"))
+            string directory = "";
+            RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+            using (RegistryKey key = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 244210"))
             {
-                return @"C:\Program Files (x86)\Steam\SteamApps\common\assettocorsa";
+                if (key != null)
+                {
+                    directory = (string)key.GetValue("InstallLocation");
+                }
             }
-            else if(Directory.Exists(@"C:\Program Files\Steam\SteamApps\common\assettocorsa"))
+            if(string.IsNullOrEmpty(directory) && Directory.Exists(@"C:\Program Files (x86)\Steam\SteamApps\common\assettocorsa"))
             {
-                return @"C:\Program Files\Steam\SteamApps\common\assettocorsa";
+                directory = @"C:\Program Files (x86)\Steam\SteamApps\common\assettocorsa";
+            }
+            else if(string.IsNullOrEmpty(directory) && Directory.Exists(@"C:\Program Files\Steam\SteamApps\common\assettocorsa"))
+            {
+                directory = @"C:\Program Files\Steam\SteamApps\common\assettocorsa";
             }
 
-            return null;
+            return directory;
         }
 
         // from http://msdn.microsoft.com/en-us/library/bb762914.aspx
