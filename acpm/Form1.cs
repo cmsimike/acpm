@@ -182,7 +182,6 @@ namespace acpm
             try
             {
                 string tmpDir = this.GetTemporaryDirectory();
-                System.Console.WriteLine(tmpDir);
                 ZipFile.ExtractToDirectory(fileToUnzip, tmpDir);
                 this.DirectoryCopy(tmpDir, this.getACPath(), true);
 
