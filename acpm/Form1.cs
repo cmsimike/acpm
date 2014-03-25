@@ -15,6 +15,7 @@ using System.Runtime.CompilerServices;
 using System.IO;
 using System.IO.Compression;
 using Microsoft.Win32;
+using System.Security.Cryptography;
 
 namespace acpm
 {
@@ -33,7 +34,7 @@ namespace acpm
 
         public void pullLatestPackages()
         {
-            List<Package> packages = this.getPackagesGithub();
+            List<Package> packages = this.getPackagesAcmpr();
             if(packages == null)
             {
                 this.setText(this.label2, "There was a problem loading the repository.\nPlease restart the app to try again.");
@@ -45,6 +46,7 @@ namespace acpm
                 this.dataGridView1.Columns[0].Visible = false;
                 this.dataGridView1.Columns[1].Visible = false;
                 this.dataGridView1.Columns[2].Visible = false;
+                this.dataGridView1.Columns[5].Visible = false;
 
                 this.dataGridView1.Columns[3].ReadOnly = true;
                 this.dataGridView1.Columns[3].FillWeight = 200;
@@ -140,13 +142,13 @@ namespace acpm
             return this.jsonToPackages(json);
         }
 
-        private List<Package> getPackagesGithub()
+        private List<Package> getPackagesAcmpr()
         {
             using (WebClient client = new WebClient())
             {
                 try
                 {
-                    string s = client.DownloadString(@"https://raw.github.com/cmsimike/acpmr/master/repository.json");
+                    string s = client.DownloadString(@"http://www.acpm.io/package/repository.json");
                     return this.jsonToPackages(s);
                 }
                 catch(WebException)
@@ -182,19 +184,33 @@ namespace acpm
             try
             {
                 string tmpDir = this.GetTemporaryDirectory();
-                ZipFile.ExtractToDirectory(fileToUnzip, tmpDir);
-                this.DirectoryCopy(tmpDir, this.getACPath(), true);
+                string computedDownloadedHash = null;
+                // need to check hash here
+                using (var md5 = MD5.Create())
+                {
+                    using (var stream = File.OpenRead(fileToUnzip))
+                    {
+                        computedDownloadedHash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower();
+                    }
+                }
 
-                JsonStore store = new JsonStore();
+                if (thePackage.fileHash == computedDownloadedHash)
+                {
+                    ZipFile.ExtractToDirectory(fileToUnzip, tmpDir);
+                    this.DirectoryCopy(tmpDir, this.getACPath(), true);
 
-                store.packageInstalled(thePackage);
-                thePackage.setComplete();
-                 
+                    JsonStore store = new JsonStore();
+
+                    store.packageInstalled(thePackage);
+                    thePackage.setComplete();
+                    return;
+                }                 
             }
             catch(Exception)
             {
-                thePackage.setErrored();
+               
             }
+            thePackage.setErrored();
         }
 
         private string GetTemporaryDirectory()

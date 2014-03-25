@@ -1,20 +1,3 @@
 [
-   {
-      "packageName":"test",
-      "downloadUrl":"http:\/\/rivalitempo-softgrip.rhcloud.com\/download\/rivali-ov1info-v2.0.zip",
-      "version":1,
-      "name": "Some Awesome Package"
-   },
-   {
-      "packageName":"test1",
-      "downloadUrl":"http:\/\/rivalitempo-softgrip.rhcloud.com\/download\/rivali-ov1info-v2.0.zip",
-      "version":1,
-      "name": "Some Awesome Package1"
-   },
-   {
-      "packageName":"test2",
-      "downloadUrl":"http:\/\/rivalitempo-softgrip.rhcloud.com\/download\/rivali-ov1info-v2.0.zip",
-      "version":2,
-      "name": "Some Awesome Package2"
-   }
+{"version":1,"name":"Super awesome something","packageName":"1","category":"Track","downloadUrl":"http://example.local/thing.zip","fileHash":"nope"}
 ]

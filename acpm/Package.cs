@@ -14,13 +14,13 @@ namespace acpm
         private static int STATIC_CLEAR = 0;
         private static int STATUS_DOWNLOADING = 1;
         private static int STATUS_ERROR = 2;
+        private int CurrentStatus { get; set; }
+        private JsonStore store = new JsonStore();
+
         public string packageName {get; set;}
         public int version {get; set;}
         public string downloadUrl {get; set;}
         public string name { get; set; }
-        private int CurrentStatus { get; set; }
-
-        private JsonStore store = new JsonStore();
         public string status {
             get {
                 // If the package is in some sort of current status, return that first
@@ -48,6 +48,8 @@ namespace acpm
                 return "Something bad";
             }
         }
+
+        public string fileHash { get; set; }
 
         public bool canInstall()
         {
